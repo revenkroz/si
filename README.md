@@ -1,6 +1,6 @@
-# SI — Simple http-server and opinionated wrapper for chi-router
+# Si — simple Go HTTP-server
 
-SI is a simple http-server and wrapper for the [chi-router](https://github.com/go-chi/chi) which provides a more convenient way to handle requests.
+Si is a simple http-server and wrapper for the [chi-router](https://github.com/go-chi/chi) which provides a more convenient way to handle requests.
 
 It has no dependencies other than chi and is designed to be as lightweight as possible.
 
