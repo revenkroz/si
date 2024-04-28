@@ -7,7 +7,7 @@ It has no dependencies other than chi and is designed to be as lightweight as po
 ## Installation
 
 ```bash
-go get -u github.com/revenkroz/si
+go get -u github.com/revenkroz/si@latest
 ```
 ## Usage
 
