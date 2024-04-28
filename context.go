@@ -100,13 +100,13 @@ func (ctx *Context) CookieString(key string) string {
 // URL methods
 // -----
 
-// GetMethod gets the HTTP method
-func (ctx *Context) GetMethod() string {
+// Method gets the HTTP method
+func (ctx *Context) Method() string {
 	return ctx.Request.Method
 }
 
-// GetHost gets the host
-func (ctx *Context) GetHost() string {
+// Host gets the host
+func (ctx *Context) Host() string {
 	return ctx.Request.Host
 }
 
@@ -275,9 +275,9 @@ func (ctx *Context) WriteStatus(statusCode int) {
 	ctx.Response.WriteHeader(statusCode)
 }
 
-// WriteCookie writes a cookie
+// SetCookie writes a cookie
 // Can be used to clear a cookie by setting MaxAge to -1
-func (ctx *Context) WriteCookie(cookie *http.Cookie) {
+func (ctx *Context) SetCookie(cookie *http.Cookie) {
 	ctx.Response.Header().Add("Set-Cookie", cookie.String())
 }
 

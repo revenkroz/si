@@ -70,3 +70,39 @@ func (s *Server) Stop() error {
 func (s *Server) AddRoute(pattern string, subrouter *Router) {
 	s.Router.Mount(pattern, subrouter)
 }
+
+func (s *Server) Get(pattern string, handler HandlerFunc) {
+	s.Router.Get(pattern, handler)
+}
+
+func (s *Server) Post(pattern string, handler HandlerFunc) {
+	s.Router.Post(pattern, handler)
+}
+
+func (s *Server) Put(pattern string, handler HandlerFunc) {
+	s.Router.Put(pattern, handler)
+}
+
+func (s *Server) Patch(pattern string, handler HandlerFunc) {
+	s.Router.Patch(pattern, handler)
+}
+
+func (s *Server) Delete(pattern string, handler HandlerFunc) {
+	s.Router.Delete(pattern, handler)
+}
+
+func (s *Server) Connect(pattern string, handler HandlerFunc) {
+	s.Router.Connect(pattern, handler)
+}
+
+func (s *Server) Head(pattern string, handler HandlerFunc) {
+	s.Router.Head(pattern, handler)
+}
+
+func (s *Server) Options(pattern string, handler HandlerFunc) {
+	s.Router.Options(pattern, handler)
+}
+
+func (s *Server) Trace(pattern string, handler HandlerFunc) {
+	s.Router.Trace(pattern, handler)
+}
