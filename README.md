@@ -4,6 +4,14 @@ Si is a simple http-server and wrapper for the [chi-router](https://github.com/g
 
 It has no dependencies other than chi and is designed to be as lightweight as possible.
 
+## Features
+
+- ✨ Easy to install, easy to use, almost dependency-free
+- 🗂 Ability to use libraries (e.g. middlewares) built around chi-router
+- 📦 Ability to get `http.Request` and `http.ResponseWriter` for advanced needs from the `si.Context`
+- 🪶 Write less boilerplate code!
+
+
 ## Installation
 
 ```bash
