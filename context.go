@@ -32,7 +32,7 @@ func (ctx *Context) SetAttribute(key ContextKey, value interface{}) {
 }
 
 // GetAttribute gets a value from the context
-func (ctx *Context) GetAttribute(key string) interface{} {
+func (ctx *Context) GetAttribute(key ContextKey) interface{} {
 	return ctx.Request.Context().Value(key)
 }
 
