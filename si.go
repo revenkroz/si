@@ -4,7 +4,7 @@ import "net/http"
 
 type Map map[string]interface{}
 
-type Handler func(ctx Context)
+type Handler func(ctx *Context)
 
 type Middleware func(http.Handler) http.Handler
 
@@ -12,15 +12,15 @@ type Middleware func(http.Handler) http.Handler
 func Si(
 	request *http.Request,
 	response http.ResponseWriter,
-) Context {
-	return Context{
+) *Context {
+	return &Context{
 		Request:  request,
 		Response: response,
 	}
 }
 
 // MW creates a new middleware
-func MW(f func(ctx Context)) Middleware {
+func MW(f Handler) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := Si(r, w)
