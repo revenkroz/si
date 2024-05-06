@@ -37,13 +37,13 @@ func main() {
 	)
 
 	// Adds a new GET-route under /
-	server.Get("/", func(ctx si.Context) {
+	server.Get("/", func(ctx *si.Context) {
 		// Sends a string response with status code 200
 		ctx.SendString("Hello, world!", 200)
 	})
 
 	// Adds a new GET-route under /json
-	server.Get("/json", func(ctx si.Context) {
+	server.Get("/json", func(ctx *si.Context) {
 		// Sends a json response with status code 200
 		ctx.SendJSON(map[string]string{
 			"message": "Hello, world!",
@@ -51,7 +51,7 @@ func main() {
 	})
 
 	// Adds a new GET-route under /j
-	server.Get("/j", func(ctx si.Context) {
+	server.Get("/j", func(ctx *si.Context) {
 		// Does the same as the previous route, but with a shortcut method
 		ctx.SJ(map[string]string{
 			"message": "Hello, world!",
@@ -60,7 +60,7 @@ func main() {
 
 	// Creates a new subrouter which will be mounted under /hello (e.g. /hello/{name})
 	subrouter := si.NewRouter()
-	subrouter.Get("/{name}", func(ctx si.Context) {
+	subrouter.Get("/{name}", func(ctx *si.Context) {
 		// Gets the value of the name parameter as a string
 		name := ctx.ParamString("name")
 
