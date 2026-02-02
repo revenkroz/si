@@ -426,7 +426,7 @@ func (ctx *Context) SendErrorJSON(message string, statusCode int) {
 
 // SendStream sends a stream
 func (ctx *Context) SendStream(stream io.ReadCloser, statusCode int) {
-	defer stream.Close()
+	defer func() { _ = stream.Close() }()
 
 	if statusCode == 0 {
 		statusCode = http.StatusOK

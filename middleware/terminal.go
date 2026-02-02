@@ -22,8 +22,7 @@ func init() {
 
 // ANSI color codes — normal.
 var (
-	nBlack   = []byte{'\033', '[', '3', '0', 'm'}
-	nYellow  = []byte{'\033', '[', '3', '3', 'm'}
+	nYellow = []byte{'\033', '[', '3', '3', 'm'}
 )
 
 // ANSI color codes — bright/bold.
@@ -41,10 +40,10 @@ var (
 // cW writes a coloured string to w when IsTTY and useColor are true.
 func cW(w io.Writer, useColor bool, color []byte, s string, args ...interface{}) {
 	if IsTTY && useColor {
-		w.Write(color)
+		_, _ = w.Write(color)
 	}
-	fmt.Fprintf(w, s, args...)
+	_, _ = fmt.Fprintf(w, s, args...)
 	if IsTTY && useColor {
-		w.Write(reset)
+		_, _ = w.Write(reset)
 	}
 }

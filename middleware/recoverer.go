@@ -50,10 +50,10 @@ func PrintPrettyStack(rvr interface{}) {
 	s := prettyStack{}
 	out, err := s.parse(debugStack, rvr)
 	if err == nil {
-		RecovererErrorWriter.Write(out)
+		_, _ = RecovererErrorWriter.Write(out)
 	} else {
 		// Print stdlib output as a fallback.
-		os.Stderr.Write(debugStack)
+		_, _ = os.Stderr.Write(debugStack)
 	}
 }
 
