@@ -36,10 +36,53 @@ func (ctx *Context) GetAttribute(key ContextKey) interface{} {
 	return ctx.Request.Context().Value(key)
 }
 
+// ContentType returns the request Content-Type without parameters
+func (ctx *Context) ContentType() string {
+	ct := ctx.Request.Header.Get("Content-Type")
+	if i := strings.IndexByte(ct, ';'); i > 0 {
+		return strings.TrimSpace(ct[:i])
+	}
+	return ct
+}
+
+// IsJSON returns true if the request Content-Type is application/json
+func (ctx *Context) IsJSON() bool {
+	return ctx.ContentType() == "application/json"
+}
+
+// IsForm returns true if the request Content-Type is application/x-www-form-urlencoded
+func (ctx *Context) IsForm() bool {
+	return ctx.ContentType() == "application/x-www-form-urlencoded"
+}
+
+// IsMultipartForm returns true if the request Content-Type is multipart/form-data
+func (ctx *Context) IsMultipartForm() bool {
+	return strings.HasPrefix(ctx.ContentType(), "multipart/form-data")
+}
+
+// BearerToken extracts the Bearer token from the Authorization header.
+// Returns empty string if the header is missing or not a Bearer token.
+func (ctx *Context) BearerToken() string {
+	auth := ctx.Request.Header.Get("Authorization")
+	if len(auth) > 7 && strings.EqualFold(auth[:7], "bearer ") {
+		return auth[7:]
+	}
+	return ""
+}
+
+// BasicAuth returns the username and password from the request's
+// Authorization header, if the request uses HTTP Basic Authentication.
+func (ctx *Context) BasicAuth() (username, password string, ok bool) {
+	return ctx.Request.BasicAuth()
+}
+
 // IP gets the IP address of the client
 func (ctx *Context) IP() string {
-	if ctx.Request.Header.Get("X-Forwarded-For") != "" {
-		return ctx.Request.Header.Get("X-Forwarded-For")
+	if xff := ctx.Request.Header.Get("X-Forwarded-For"); xff != "" {
+		if i := strings.IndexByte(xff, ','); i > 0 {
+			return strings.TrimSpace(xff[:i])
+		}
+		return xff
 	}
 
 	return ctx.Request.RemoteAddr
@@ -150,11 +193,36 @@ func (ctx *Context) QueryString(key string) string {
 	return value
 }
 
+// QueryStringDefault gets a query parameter as a string with a default value
+func (ctx *Context) QueryStringDefault(key string, def string) string {
+	value := ctx.Request.URL.Query().Get(key)
+	if value == "" {
+		return def
+	}
+
+	return value
+}
+
 // QueryInt gets a query parameter as an int
 func (ctx *Context) QueryInt(key string) int {
 	value, err := strconv.Atoi(ctx.Request.URL.Query().Get(key))
 	if err != nil {
 		return 0
+	}
+
+	return value
+}
+
+// QueryIntDefault gets a query parameter as an int with a default value
+func (ctx *Context) QueryIntDefault(key string, def int) int {
+	raw := ctx.Request.URL.Query().Get(key)
+	if raw == "" {
+		return def
+	}
+
+	value, err := strconv.Atoi(raw)
+	if err != nil {
+		return def
 	}
 
 	return value
@@ -213,10 +281,8 @@ func (ctx *Context) GetFormData() (map[string][]string, error) {
 		return nil, err
 	}
 
-	err = req.ParseMultipartForm(32 << 20)
-	if err != nil {
-		return nil, err
-	}
+	// Ignore error from ParseMultipartForm — it fails for non-multipart requests
+	_ = req.ParseMultipartForm(32 << 20)
 
 	if len(req.Form) == 0 {
 		return req.PostForm, nil
@@ -323,6 +389,27 @@ func (ctx *Context) SendJSON(data any, statusCode int) {
 	}
 }
 
+// SendHTML sends an HTML response
+func (ctx *Context) SendHTML(data string, statusCode int) {
+	if statusCode == 0 {
+		statusCode = http.StatusOK
+	}
+
+	ctx.Response.Header().Set("Content-Type", "text/html; charset=utf-8")
+	ctx.Response.WriteHeader(statusCode)
+	_, _ = fmt.Fprint(ctx.Response, data)
+}
+
+// NoContent sends a 204 No Content response
+func (ctx *Context) NoContent() {
+	ctx.Response.WriteHeader(http.StatusNoContent)
+}
+
+// SendFile serves a file from the given path
+func (ctx *Context) SendFile(filepath string) {
+	http.ServeFile(ctx.Response, ctx.Request, filepath)
+}
+
 // SendErrorJSON sends an error JSON response
 func (ctx *Context) SendErrorJSON(message string, statusCode int) {
 	if statusCode == 0 {
@@ -339,6 +426,8 @@ func (ctx *Context) SendErrorJSON(message string, statusCode int) {
 
 // SendStream sends a stream
 func (ctx *Context) SendStream(stream io.ReadCloser, statusCode int) {
+	defer func() { _ = stream.Close() }()
+
 	if statusCode == 0 {
 		statusCode = http.StatusOK
 	}
